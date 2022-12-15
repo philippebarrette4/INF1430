@@ -1,0 +1,60 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+# Electricity bedroom one
+df_B1E <- readr::read_csv("../data/dataverse_files/Electricity_B1E.csv")
+# Electricity bedroom 2
+df_B2E <- readr::read_csv("../data/dataverse_files/Electricity_B2E.csv")
+```
+
+```{r}
+# Electricity Billing
+electBillDF <- readr::read_csv("../data/dataverse_files/Electricity_Billing.csv")
+```
+
+```{r}
+electBillDF <- electBillDF %>%
+    mutate(
+      BillingSumTotal = 
+        round(as.numeric(electBillDF$`Basic Charge` + electBillDF$`Usage Charge Step 1` + electBillDF$`Usage Charge Step 2` + electBillDF$`Rate Rider`), digits = 2),
+      BillingSumTotalBool = 
+        round(as.numeric(electBillDF$`Basic Charge` + electBillDF$`Usage Charge Step 1` + electBillDF$`Usage Charge Step 2` + electBillDF$`Rate Rider`), digits = 2) ==
+        round(as.numeric(electBillDF$`Total Energy Charge`), digits = 2)
+    )
+```
+```{r}
+head(electBillDF)
+```
+```{r}
+df <- electBillDF %>% select(`Basic Charge`)
+```
+```{r}
+df <- readr::read_csv(
+  "../data/dataverse_files/Electricity_Billing.csv", 
+  col_types = cols(
+    `Basic Charge` = col_double()
+  )
+)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
