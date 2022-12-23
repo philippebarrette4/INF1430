@@ -1,5 +1,9 @@
 # Concept Definition
 
+## 1. General
+
+- Docs: https://www.nature.com/articles/sdata201637/tables/5
+
 ## 1. Electricity_???.csv
 
 **Volt (V)**: 
