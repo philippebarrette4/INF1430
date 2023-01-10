@@ -2,7 +2,10 @@
 
 ## 1. General
 
-- Docs: https://www.nature.com/articles/sdata201637/tables/5
+- Docs: 
+  - https://www.nature.com/articles/sdata201637/tables/5
+  - https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/FIE0S4
+  - https://www.nature.com/articles/sdata201637
 
 ## 1. Electricity_???.csv
 
