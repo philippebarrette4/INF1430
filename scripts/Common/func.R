@@ -22,6 +22,7 @@ convert_timeStamp <- function(dframe, unix_ts_col_name){
             hour        = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%H")),
             minute      = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%M"))
         ) %>%
+        select(timeStamp, date, year, month, day, hour, minute, everything()) %>%
         select(-all_of(unix_ts_col_name))
 
     return(dframe2)
