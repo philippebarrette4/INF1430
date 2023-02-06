@@ -48,14 +48,14 @@ silverDF <- rawDF %>%
 goldDailyDF <- silverDF %>%
     group_by(year, month, day, date) %>%
     summarise(
-        consumtpion = sum(avg_rate_modif) / 1000
+        consumption = sum(avg_rate_modif) / 1000
     )
 
 # Aggregation of consumption (kWh) by month
 goldMonthlyDF <- silverDF %>%
     group_by(year, month) %>%
     summarise(
-        consumtpion = sum(avg_rate_modif) / 1000
+        consumption = sum(avg_rate_modif) / 1000
     )
 
 #=====================================================
