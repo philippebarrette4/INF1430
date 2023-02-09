@@ -47,7 +47,7 @@ goldDailyDF <- silverDF %>%
 goldMonthlyDF <- silverDF %>%
     group_by(year, month) %>%
     summarise(
-        consumtpion = sum(avg_rate_modif)
+        consumption = sum(avg_rate_modif)
     )
 
 #=====================================================
