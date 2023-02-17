@@ -35,11 +35,18 @@ silverDF <- rawDF %>%
 # GOLD DATAFRAMES: AGGREGATE DATA
 #=====================================================
 
+# Aggregation of consumption (kL) by hour
+goldHourlyDF <- silverDF %>%
+    group_by(year, month, date, day, hour) %>%
+    summarise(
+        consumption = sum(avg_rate)
+    )
+
 # Aggregation of consumption (kL) by day
 goldDailyDF <- silverDF %>%
     group_by(year, month, day, date) %>%
     summarise(
-        consumtpion = sum(avg_rate)
+        consumption = sum(avg_rate)
     )
 
 # Aggregation of consumption (kL) by month
@@ -53,6 +60,8 @@ goldMonthlyDF <- silverDF %>%
 # WRITE GOLD DATAFRAMES TO CSV FILES
 #=====================================================
 
+# Hourly water Data Frame
+write_csv(goldHourlyDF,      append = FALSE, file = "curated/water/gold_hourly_water.csv",    col_names = TRUE)
 # Daily water Data Frame
 write_csv(goldDailyDF,      append = FALSE, file = "curated/water/gold_daily_water.csv",    col_names = TRUE)
 # Monthly water Data Frame

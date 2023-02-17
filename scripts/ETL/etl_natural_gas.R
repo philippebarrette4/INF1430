@@ -36,11 +36,19 @@ silverDF <- rawDF %>%
 # GOLD DATAFRAMES: AGGREGATE DATA
 #=====================================================
 
+# Aggregation of consumption (m3) by hour
+goldHourlyDF <- silverDF %>%
+    group_by(year, month, day, date, hour) %>%
+    summarise(
+        consumption = sum(avg_rate_modif)
+    )
+    
+
 # Aggregation of consumption (m3) by day
 goldDailyDF <- silverDF %>%
     group_by(year, month, day, date) %>%
     summarise(
-        consumtpion = sum(avg_rate_modif)
+        consumption = sum(avg_rate_modif)
     )
 
 # Aggregation of consumption (m3) by month
@@ -54,6 +62,8 @@ goldMonthlyDF <- silverDF %>%
 # WRITE GOLD DATAFRAMES TO CSV FILES
 #=====================================================
 
+# Hourly natural gas Data Frame
+write_csv(goldHourlyDF,      append = FALSE, file = "curated/natural_gas/gold_hourly_natural_gas.csv",    col_names = TRUE)
 # Daily natural gas Data Frame
 write_csv(goldDailyDF,      append = FALSE, file = "curated/natural_gas/gold_daily_natural_gas.csv",    col_names = TRUE)
 # Monthly natural gas Data Frame
