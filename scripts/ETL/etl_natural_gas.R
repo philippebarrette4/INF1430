@@ -51,6 +51,13 @@ goldDailyDF <- silverDF %>%
         consumption = sum(avg_rate_modif)
     )
 
+# Aggregation of consumption (m3) by week
+goldWeeklyDF <- silverDF %>%
+    group_by(year, week) %>%
+    summarise(
+        consumption = sum(avg_rate_modif)
+    )
+
 # Aggregation of consumption (m3) by month
 goldMonthlyDF <- silverDF %>%
     group_by(year, month) %>%
@@ -63,8 +70,10 @@ goldMonthlyDF <- silverDF %>%
 #=====================================================
 
 # Hourly natural gas Data Frame
-write_csv(goldHourlyDF,      append = FALSE, file = "curated/natural_gas/gold_hourly_natural_gas.csv",    col_names = TRUE)
+write_csv(goldHourlyDF,     append = FALSE, file = "curated/natural_gas/gold_hourly_natural_gas.csv",   col_names = TRUE)
 # Daily natural gas Data Frame
 write_csv(goldDailyDF,      append = FALSE, file = "curated/natural_gas/gold_daily_natural_gas.csv",    col_names = TRUE)
+# Weekly natural gas Data Frame
+write_csv(goldWeeklyDF,     append = FALSE, file = "curated/natural_gas/gold_weekly_natural_gas.csv",   col_names = TRUE)
 # Monthly natural gas Data Frame
 write_csv(goldMonthlyDF,    append = FALSE, file = "curated/natural_gas/gold_monthly_natural_gas.csv",  col_names = TRUE)

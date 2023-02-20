@@ -39,21 +39,28 @@ silverDF <- rawDF %>%
 goldHourlyDF <- silverDF %>%
     group_by(year, month, date, day, hour) %>%
     summarise(
-        consumption = sum(avg_rate)
+        consumption = round(sum(avg_rate), 2)
     )
 
 # Aggregation of consumption (kL) by day
 goldDailyDF <- silverDF %>%
     group_by(year, month, day, date) %>%
     summarise(
-        consumption = sum(avg_rate)
+        consumption = round(sum(avg_rate), 2)
+    )
+
+# Aggregation of consumption (kL) by week
+goldWeeklyDF <- silverDF %>%
+    group_by(year, week) %>%
+    summarise(
+        consumption = round(sum(avg_rate), 2)
     )
 
 # Aggregation of consumption (kL) by month
 goldMonthlyDF <- silverDF %>%
     group_by(year, month) %>%
     summarise(
-        consumption = sum(avg_rate)
+        consumption = round(sum(avg_rate), 2)
     )
 
 #=====================================================
@@ -61,8 +68,10 @@ goldMonthlyDF <- silverDF %>%
 #=====================================================
 
 # Hourly water Data Frame
-write_csv(goldHourlyDF,      append = FALSE, file = "curated/water/gold_hourly_water.csv",    col_names = TRUE)
+write_csv(goldHourlyDF,     append = FALSE, file = "curated/water/gold_hourly_water.csv",   col_names = TRUE)
 # Daily water Data Frame
 write_csv(goldDailyDF,      append = FALSE, file = "curated/water/gold_daily_water.csv",    col_names = TRUE)
+# Weekly water Data Frame
+write_csv(goldWeeklyDF,     append = FALSE, file = "curated/water/gold_weekly_water.csv",   col_names = TRUE)
 # Monthly water Data Frame
 write_csv(goldMonthlyDF,    append = FALSE, file = "curated/water/gold_monthly_water.csv",  col_names = TRUE)

@@ -48,21 +48,28 @@ silverDF <- rawDF %>%
 goldHourlyDF <- silverDF %>%
     group_by(year, month, day, date, hour) %>%
     summarise(
-        consumption = sum(avg_rate_modif) / 1000
+        consumption = round(sum(avg_rate_modif) / 1000, 2)
     )
 
 # Aggregation of consumption (kWh) by day
 goldDailyDF <- silverDF %>%
     group_by(year, month, day, date) %>%
     summarise(
-        consumption = sum(avg_rate_modif) / 1000
+        consumption = round(sum(avg_rate_modif) / 1000, 2)
+    )
+
+# Aggregation of consumption (kWh) by week
+goldWeeklyDF <- silverDF %>%
+    group_by(year, week) %>%
+    summarise(
+        consumption = round(sum(avg_rate_modif) / 1000, 2)
     )
 
 # Aggregation of consumption (kWh) by month
 goldMonthlyDF <- silverDF %>%
     group_by(year, month) %>%
     summarise(
-        consumption = sum(avg_rate_modif) / 1000
+        consumption = round(sum(avg_rate_modif) / 1000, 2)
     )
 
 #=====================================================
@@ -73,5 +80,7 @@ goldMonthlyDF <- silverDF %>%
 write_csv(goldHourlyDF,     append = FALSE, file = "curated/electricity/gold_hourly_electricity.csv",   col_names = TRUE)
 # Daily electricity Data Frame
 write_csv(goldDailyDF,      append = FALSE, file = "curated/electricity/gold_daily_electricity.csv",    col_names = TRUE)
+# Weekly electricity Data Frame
+write_csv(goldWeeklyDF,      append = FALSE, file = "curated/electricity/gold_weekly_electricity.csv",  col_names = TRUE)
 # Monthly electricity Data Frame
 write_csv(goldMonthlyDF,    append = FALSE, file = "curated/electricity/gold_monthly_electricity.csv",  col_names = TRUE)
