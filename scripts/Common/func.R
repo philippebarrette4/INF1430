@@ -14,14 +14,15 @@ convert_timeStamp <- function(dframe, unix_ts_col_name){
     
     dframe2 <- dframe %>%
         mutate(
-            timeStamp = as.POSIXct(dframe[[unix_ts_col_name]], origin = "1970-01-01 12:00:00"),
-            date        = as.Date(format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%Y-%m-%d"), format = "%Y-%m-%d"),
-            year        = format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%Y"),
-            month       = format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%m"),
-            day         = format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%d"),
-            hour        = format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%H"),
-            minute      = format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%M")
+            timeStamp   = as.POSIXct(   dframe[[unix_ts_col_name]], origin = "1970-01-01 12:00:00"),
+            date        = as.Date(      format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%Y-%m-%d"), format = "%Y-%m-%d"),
+            year        = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%Y")),
+            month       = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%m")),
+            day         = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%d")),
+            hour        = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%H")),
+            minute      = as.integer(   format(as.POSIXct(unix_ts, origin = "1970-01-01 12:00:00"), format = "%M"))
         ) %>%
+        select(timeStamp, date, year, month, day, hour, minute, everything()) %>%
         select(-all_of(unix_ts_col_name))
 
     return(dframe2)
