@@ -46,3 +46,62 @@ yearly_consumption <- function(dframe, cons_col_name){
         )  
     return(dframe2)
 }
+
+# Create a function that filters a DataFrame based on year, month and range of day numbers
+filter_date_range <- function(pDF, pYear, pMonth, pDay1, pDay2) {
+    if(all(c("year", "month", "day") %in% colnames(pDF), TRUE)) {
+        pFilteredDF <- pDF %>% filter(year == pYear, month == pMonth, day > pDay1, day <= pDay2)
+    } else {
+        stop("The DataFrame provided in parameter is missing one or more of these columns: 'year', 'month' and 'day'!")
+    }
+    return(pFilteredDF)
+}
+
+# Create function that calculates an instant by day
+create_instant_time <- function(pDF) {
+    # Check if necessary columns exist
+    if(all(c("hour", "date") %in% colnames(pDF), TRUE)) {
+        # Create DataFrame with 'instant' column
+        InstantDF <- pDF %>%
+            mutate(
+                time = format(strptime(hour, format="%H"), format = "%H:00"),
+                date_time = paste0(date, " ", time),
+                unix_ts = as.numeric(as.POSIXct(date_time)),
+                instant = (unix_ts - min(unix_ts)) / (24 * 3600)
+            ) %>%
+            select(-c(time, date_time, unix_ts))
+    } else {
+        stop("The DataFrame provided in parameter is missing one or more of these columns: 'hour', 'date' and 'unix_ts'!")
+    }
+    return(InstantDF)
+}
+
+# Define a function tha generates a weekly line plot based on a DataFrame
+create_base_weekly_line_plot <- function(pDF, pXaxis, pYaxis, plabelProperties, pAvgYaxis, pYlimMin, pYlimMax, hasXaxis=FALSE) {
+    # Parameters to string
+    pXaxisStr <- deparse(substitute(pXaxis))
+    pYaxisStr <- deparse(substitute(pYaxis))
+    # Check if necessary columns exist
+    if(all(c(pXaxisStr, pYaxisStr) %in% colnames(pDF), TRUE)) {
+        # Plot definition
+        base_plt <- ggplot(pDF, aes(x = {{ pXaxis }}, y = {{ pYaxis }})) +
+            geom_line() +
+            scale_x_continuous(breaks = 0:7, labels = 0:7) + 
+            geom_label(data = pDF %>% filter({{ pYaxis }} < quantile({{ pYaxis }}, 0.05)), aes(label = {{ pYaxis }}), color = plabelProperties$pct05_color, fill = plabelProperties$pct05_fill) +
+            geom_label(data = pDF %>% filter({{ pYaxis }} > quantile({{ pYaxis }}, 0.95)), aes(label = {{ pYaxis }}), color = plabelProperties$pct95_color, fill = plabelProperties$pct95_fill) +
+            theme_light() +
+            ylim(pYlimMin, pYlimMax) + 
+            geom_hline(yintercept = pAvgYaxis, color = "blue", linetype = "dotted", linewidth = 1) + 
+            geom_label(label = "Average", x = 7, y = 1.5, color = "blue")
+
+        if(hasXaxis){
+            plt <- base_plt + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
+        } else {
+            plt <- base_plt + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(), axis.title.y = element_blank())
+        }
+
+    } else {
+        stop("The DataFrame provided in parameter is missing one or more of the axis defined in parameters!")
+    }
+    return(plt)
+}
