@@ -77,7 +77,7 @@ create_instant_time <- function(pDF) {
 }
 
 # Define a function tha generates a weekly line plot based on a DataFrame
-create_base_weekly_line_plot <- function(pDF, pXaxis, pYaxis, plabelProperties, pAvgYaxis, pYlimMin, pYlimMax, hasXaxis=FALSE) {
+create_base_weekly_line_plot <- function(pDF, pXaxis, pYaxis, plabelProperties, pAvgYaxis, pYlimMin, pYlimMax, pHasXaxis=FALSE) {
     # Parameters to string
     pXaxisStr <- deparse(substitute(pXaxis))
     pYaxisStr <- deparse(substitute(pYaxis))
@@ -92,9 +92,9 @@ create_base_weekly_line_plot <- function(pDF, pXaxis, pYaxis, plabelProperties, 
             theme_light() +
             ylim(pYlimMin, pYlimMax) + 
             geom_hline(yintercept = pAvgYaxis, color = "blue", linetype = "dotted", linewidth = 1) + 
-            geom_label(label = "Average", x = 7, y = 1.5, color = "blue")
+            geom_label(label = "Average", x = 7, y = pAvgYaxis, color = "blue")
 
-        if(hasXaxis){
+        if(pHasXaxis){
             plt <- base_plt + theme(axis.title.x = element_blank(), axis.title.y = element_blank())
         } else {
             plt <- base_plt + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(), axis.title.x = element_blank(), axis.title.y = element_blank())
