@@ -1,6 +1,9 @@
 # Import packages
-library(dplyr)
-library(readr)
+library(tidyr)
+
+#=================================================
+# CONVERSION FUNCTIONS
+#=================================================
 
 convert_timeStamp <- function(dframe, unix_ts_col_name){
     #' Derived columns based on a unix timestamp one.
@@ -28,6 +31,10 @@ convert_timeStamp <- function(dframe, unix_ts_col_name){
     return(dframe2)
 }
 
+#=================================================
+# AGGREGATION FUNCTIONS
+#=================================================
+
 yearly_consumption <- function(dframe, cons_col_name){
     #' Computes yearly consumption of either electricity (kWh), water (kL) or gaz (m^2)
     #' 
@@ -46,6 +53,10 @@ yearly_consumption <- function(dframe, cons_col_name){
         )  
     return(dframe2)
 }
+
+#=================================================
+# DATA WRANGLING FUNCTIONS
+#=================================================
 
 # Create a function that filters a DataFrame based on year, month and range of day numbers
 filter_date_range <- function(pDF, pYear, pMonth, pDay1, pDay2) {
@@ -75,6 +86,10 @@ create_instant_time <- function(pDF) {
     }
     return(InstantDF)
 }
+
+#=================================================
+# PLOT FUNCTIONS
+#=================================================
 
 # Define a function tha generates a weekly line plot based on a DataFrame
 create_base_weekly_line_plot <- function(pDF, pXaxis, pYaxis, plabelProperties, pAvgYaxis, pYlimMin, pYlimMax, pHasXaxis=FALSE) {
