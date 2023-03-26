@@ -105,3 +105,37 @@ create_base_weekly_line_plot <- function(pDF, pXaxis, pYaxis, plabelProperties, 
     }
     return(plt)
 }
+
+#=================================================
+# CORRELATION FUNCTIONS
+#=================================================
+
+weather_consumption_correlation <- function(pDF, pTimeFrame) {
+    colsList <- c("avg_temp", "avg_dewpt_temp", "avg_rel_hum_pct", "avg_wind_dir", "avg_wind_spd", "avg_visib", "avg_stn_press", "avg_hmdx", "avg_wind_chill")
+    if(all(colsList %in% colnames(pDF), TRUE)) {
+
+        avg_temp_cor          <- round(cor(pDF["avg_temp"],          pDF["consumption"]), 3)
+        avg_dewpt_temp_cor    <- round(cor(pDF["avg_dewpt_temp"],    pDF["consumption"]), 3)
+        avg_rel_hum_pct_cor   <- round(cor(pDF["avg_rel_hum_pct"],   pDF["consumption"]), 3)
+        avg_wind_dir_cor      <- round(cor(pDF["avg_wind_dir"],      pDF["consumption"]), 3)
+        avg_wind_spd_cor      <- round(cor(pDF["avg_wind_spd"],      pDF["consumption"]), 3)
+        avg_visib_cor         <- round(cor(pDF["avg_visib"],         pDF["consumption"]), 3)
+        avg_stn_press_cor     <- round(cor(pDF["avg_stn_press"],     pDF["consumption"]), 3)
+        avg_hmdx_cor          <- round(cor(pDF["avg_hmdx"],          pDF["consumption"]), 3)
+        avg_wind_chill_cor    <- round(cor(pDF["avg_wind_chill"],    pDF["consumption"]), 3)
+
+        pTimeFrame <- str_to_title(toString(pTimeFrame))
+
+        variable_one        <- rep("Consumption", 9)
+        variable_two        <- c("Average Temperature", "Average Dew Point", "Average Relative Humidity (%)", "Average Wind Direction", "Average Wind Speed", "Average Visibility", "Average Station Pressure", "Average Humidex", "Average Wind Chill")
+        time_frame          <- rep(pTimeFrame, 9)
+        correlation         <- c(avg_temp_cor, avg_dewpt_temp_cor, avg_rel_hum_pct_cor, avg_wind_dir_cor, avg_wind_spd_cor, avg_visib_cor, avg_stn_press_cor, avg_hmdx_cor, avg_wind_chill_cor)
+
+        CorrDF <- data.frame(variable_one, variable_two, time_frame, correlation)
+
+    } else {
+        stop("Some columns are missing in the Data Frame provided in parameters.")
+    }
+
+    return(CorrDF)
+}
