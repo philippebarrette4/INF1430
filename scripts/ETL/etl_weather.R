@@ -5,6 +5,7 @@
 # Data transformation
 library(dplyr)
 library(readr)
+library(here)
 
 #=====================================================
 # RAW DATAFRAME: READ CSV FILE
@@ -13,7 +14,7 @@ library(readr)
 # Read 'Climate_HistoricalNormals.csv' file
 # Specify column types
 rawDF <- read_csv(
-    "data/Climate_HourlyWeather.csv",
+    here::here("data", "Climate_HourlyWeather.csv"),
     col_types = cols(
         `Date/Time` = col_datetime(),
         Year = col_integer(),
@@ -150,8 +151,8 @@ goldMonthlyDF <- silverDF %>%
 #=====================================================
 
 # Hourly weather Data Frame
-write_csv(goldHourlyDF,     append = FALSE, file = "curated/weather/gold_hourly_weather.csv",   col_names = TRUE)
+write_csv(goldHourlyDF,     append = FALSE, file = here::here("curated/weather", "gold_hourly_weather.csv"),   col_names = TRUE)
 # Daily weather Data Frame
-write_csv(goldDailyDF,      append = FALSE, file = "curated/weather/gold_daily_weather.csv",    col_names = TRUE)
+write_csv(goldDailyDF,      append = FALSE, file = here::here("curated/weather", "gold_daily_weather.csv"),    col_names = TRUE)
 # Monthly weather Data Frame
-write_csv(goldMonthlyDF,    append = FALSE, file = "curated/weather/gold_monthly_weather.csv",  col_names = TRUE)
+write_csv(goldMonthlyDF,    append = FALSE, file = here::here("curated/weather", "gold_monthly_weather.csv"),  col_names = TRUE)
