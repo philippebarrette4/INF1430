@@ -185,3 +185,33 @@ weather_consumption_correlation <- function(pDF, pTimeFrame) {
     # Return the CorrDF data frame
     return(CorrDF)
 }
+
+
+#' @description Computes the pairwise correlation between variables in a data frame for a given time frame.
+#' @param pDF: A data frame containing the variables to be correlated.
+#' @param pIndVarVec: A vector of strings containing the names of the variables to be correlated.
+#' @param pTimeFrame: A string indicating the time frame of the data.
+#' @return corrDF: A data frame containing the pairwise correlation between variables, as well as the time frame of the data.
+pairwise_correlations_function <- function(pDF, pIndVarVec, pTimeFrame) {
+    # Create an empty data frame with three columns to store the correlation results
+    corrDF <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("independantVariableOne", "independantVariableTwo", "correlation"))
+    # Loop over all possible pairs of variables and compute the correlation
+    for (i in 1:length(pIndVarVec)) {
+        for (j in (i+1):length(pIndVarVec)) {
+            # Only compute the correlation if both variables are not NA and are not identical
+            if(!is.na(pIndVarVec[i]) & !is.na(pIndVarVec[j]) & pIndVarVec[i] != pIndVarVec[j]) {
+                # Create a new row in the correlation data frame with the variable names and correlation coefficient
+                newRow <- c(pIndVarVec[i], pIndVarVec[j], round(cor(pDF[pIndVarVec[i]], pDF[pIndVarVec[j]]), 3))
+                corrDF[nrow(corrDF) + 1, ] <- newRow
+            }
+        }
+    }
+    # Convert the correlation column to numeric and add a column for the time frame
+    corrDF <- corrDF %>% 
+        mutate(
+            correlation = as.numeric(correlation),
+            timeFrame = pTimeFrame
+        )
+    # Return the correlation data frame
+    return(corrDF)
+}
