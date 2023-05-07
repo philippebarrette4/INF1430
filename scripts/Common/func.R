@@ -186,7 +186,6 @@ weather_consumption_correlation <- function(pDF, pTimeFrame) {
     return(CorrDF)
 }
 
-
 #' @description Computes the pairwise correlation between variables in a data frame for a given time frame.
 #' @param pDF: A data frame containing the variables to be correlated.
 #' @param pIndVarVec: A vector of strings containing the names of the variables to be correlated.
@@ -214,4 +213,74 @@ pairwise_correlations_function <- function(pDF, pIndVarVec, pTimeFrame) {
         )
     # Return the correlation data frame
     return(corrDF)
+}
+
+#=================================================
+# MODEL TRAINING
+#=================================================
+
+#' @description This function performs k-fold cross-validation on a linear regression model.
+#' @param pDF: data frame to be used
+#' @param pKFolds: number of folds to be used in cross-validation
+#' @param pFormula: formula for the linear regression model
+#' @usage cross_validation_func(my_data_frame, 5, "response ~ predictor1 + predictor2")
+#' @return Data frame with predicted values from cross-validation
+cross_validation_func <- function(pDF, pKFolds, pFormula) {
+    # Get the number of rows in the data frame
+    nRows <- nrow(pDF)
+    # Split the data into k folds using kWayCrossValidation function from a package (not shown here)
+    splitPlan <- kWayCrossValidation(nRows, pKFolds, NULL, NULL)
+    k <- pKFolds
+    pDF["predCv"] <- 0
+    for(i in 1:k) {
+        # Get the indices of the current fold for training and testing
+        split <- splitPlan[[i]]
+        # Train a linear regression model on the training data
+        model <- lm(pFormula, data = pDF[split$train, ])
+        # Use the trained model to predict the response variable for the testing data
+        pDF["predCv"][split$app, ] <- predict(model, newdata = pDF[split$app, ])
+    }
+    # Return the data frame with predicted values from cross-validation
+    return(pDF)
+}
+
+#=================================================
+# MODEL PERFORMANCE METRICS
+#=================================================
+
+#' @description This function calculates the root mean squared error (RMSE) between two columns of a data frame.
+#' @param pDF: data frame to be used
+#' @param pCol: name of the column containing the true values
+#' @param pPredCol: name of the column containing the predicted values
+#' @usage rmse_func(my_data_frame, "actual_col", "predicted_col")
+#' @return RMSE value
+rmse_func <- function(pDF, pCol, pPredCol) {
+    # Calculate the error between the predicted and true values
+    err <- (pDF[pPredCol] - pDF[pCol])[[pPredCol]]
+    # Square the errors
+    err2 <- err^2
+    # Calculate the mean of the squared errors and take the square root to get RMSE
+    rmse <- sqrt(mean(err2))
+    # Return the RMSE value
+    return(rmse)
+}
+
+#' This function calculates the coefficient of determination (R-squared) for a linear regression model.
+#' @param pDF: data frame to be used
+#' @param pCol: name of the column containing the true values
+#' @param pPredCol: name of the column containing the predicted values
+#' @usage r_squared_func(my_data_frame, "actual_col", "predicted_col")
+#' @return R-squared value
+r_squared_func <- function(pDF, pCol, pPredCol) {
+    # Calculate the error between the predicted and true values
+    err <- pDF[pPredCol] - pDF[pCol]
+    # Calculate the residual sum of squares (RSS)
+    rss <- sum(err[, pPredCol]^2)
+    # Calculate the total sum of squares (SSTO)
+    toterr <- pDF[pCol][[pCol]] - mean(as.list(pDF[pCol])[[pCol]])
+    sstot <- sum(toterr^2)
+    # Calculate the R-squared value
+    r_squared <- 1 - (rss/sstot)
+    # Return the R-squared value
+    return(r_squared)  
 }
