@@ -238,13 +238,15 @@ cross_validation_func <- function(pDF, pKFolds, pFormula, pModel) {
         if(pModel == "linear_regression"){
             # Train a linear regression model on the training data
             model <- lm(pFormula, data = pDF[split$train, ])
+            # Use the trained model to predict the response variable for the testing data
+            pDF["predCV"][split$app, ] <- predict(model, pDF[split$app, ])
         } else if(pModel == "random_forest"){
             model <- ranger(pFormula, pDF[split$train, ], num.trees = 500, respect.unordered.factors = "order")
+            # Use the trained model to predict the response variable for the testing data
+            pDF["predCV"][split$app, ] <- predict(model, pDF[split$app, ])$predictions
         } else {
             stop("Please provide a valid model algorithm ('linear_regression', 'random_forest')")
         }
-        # Use the trained model to predict the response variable for the testing data
-        pDF["predCV"][split$app, ] <- predict(model, pDF[split$app, ])
     }
     # Return the data frame with predicted values from cross-validation
     return(pDF)
