@@ -225,13 +225,13 @@ pairwise_correlations_function <- function(pDF, pIndVarVec, pTimeFrame) {
 #' @param pFormula: formula for the linear regression model
 #' @usage cross_validation_func(my_data_frame, 5, "response ~ predictor1 + predictor2")
 #' @return Data frame with predicted values from cross-validation
-cross_validation_func <- function(pDF, pKFolds, pFormula, pModel) {
+cross_validation_func <- function(pDF, pKFolds, pFormula, pModel, pPredCol) {
     # Get the number of rows in the data frame
     nRows <- nrow(pDF)
     # Split the data into k folds using kWayCrossValidation function from a package (not shown here)
     splitPlan <- kWayCrossValidation(nRows, pKFolds, NULL, NULL)
     k <- pKFolds
-    pDF["predCV"] <- 0
+    pDF[pPredCol] <- 0
     for(i in 1:k) {
         # Get the indices of the current fold for training and testing
         split <- splitPlan[[i]]
@@ -239,11 +239,11 @@ cross_validation_func <- function(pDF, pKFolds, pFormula, pModel) {
             # Train a linear regression model on the training data
             model <- lm(pFormula, data = pDF[split$train, ])
             # Use the trained model to predict the response variable for the testing data
-            pDF["predCV"][split$app, ] <- predict(model, pDF[split$app, ])
+            pDF[pPredCol][split$app, ] <- predict(model, pDF[split$app, ])
         } else if(pModel == "random_forest"){
             model <- ranger(pFormula, pDF[split$train, ], num.trees = 500, respect.unordered.factors = "order")
             # Use the trained model to predict the response variable for the testing data
-            pDF["predCV"][split$app, ] <- predict(model, pDF[split$app, ])$predictions
+            pDF[pPredCol][split$app, ] <- predict(model, pDF[split$app, ])$predictions
         } else {
             stop("Please provide a valid model algorithm ('linear_regression', 'random_forest')")
         }
