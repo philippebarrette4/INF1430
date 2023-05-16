@@ -292,3 +292,56 @@ r_squared_func <- function(pDF, pCol, pPredCol) {
     # Return the R-squared value
     return(r_squared)  
 }
+
+#=================================================
+# MODEL PERFORMANCE ANALYSIS
+#=================================================
+
+#' This function takes in a vector of linear regression models, a vector of data frames, and various parameters for calculating performance metrics such as 
+#'      - R-squared, 
+#'      - RMSE
+#'      - Standard deviation (SD)
+#' The function returns a data frame that summarizes the performance of each model over different timeframes (hour, day, month).
+#' @param pModelsVec: A vector of linear regression models.
+#' @param pDataFramesVec: A vector of data frames to evaluate the models.
+#' @param pCol: The name of the column in the data frame that contains the true values.
+#' @param pPredCol: The name of the column in the data frame that contains the predicted values.
+#' @param pPredColCv: The name of the column in the data frame that contains the predicted values (cross-validation).
+#' @return: A data frame with the following columns:
+#'     - timeFrame: The timeframe over which the model was evaluated (hour, day, month).
+#'     - rSquared: The R-squared value of the model over the given timeframe.
+#'     - rmse: The root mean squared error (RMSE) of the model over the given timeframe.
+#'     - sd: The standard deviation (SD) of the true values over the given timeframe.
+#'     - rmseIsSmallerThanSd: A binary indicator (TRUE/FALSE) indicating if the RMSE of the model is smaller than the SD of the true values over the given timeframe. 
+#'       If TRUE, the model tends to estimate consumption better than simply taking the average of the data itself.
+performance_matrix_func <- function(pModelsVec, pDataFramesVec, pCol, pPredCol, pPredColCv) {
+    # Create a data frame with columns for timeFrame, rSquared, rmse, and sd.
+    # Initialize the values for these columns with the results from the first model and the first data frame.
+    # These values will be overwritten as we loop through the different timeframes.
+    df <- data.frame(
+        timeFrame = c("hour", "day", "month"),
+        rSquared = c(
+            r_squared_func(pDataFramesVec[[1]], pCol, pPredCol),      
+            r_squared_func(pDataFramesVec[[2]], pCol, pPredCol),        
+            r_squared_func(pDataFramesVec[[3]], pCol, pPredCol)
+        ),
+        rmse = c(
+            rmse_func(pDataFramesVec[[1]], pCol, pPredCol),         
+            rmse_func(pDataFramesVec[[2]], pCol, pPredCol),          
+            rmse_func(pDataFramesVec[[3]], pCol, pPredCol)
+        ),
+        sd = c(
+            sapply(pDataFramesVec[[1]][pCol], sd),                           
+            sapply(pDataFramesVec[[2]][pCol], sd),                            
+            sapply(pDataFramesVec[[3]][pCol], sd)
+        ),
+        # If RMSE smaller than SD: Model tends to estimate consumption better than simply taking the average of the data itself
+        rmseIsSmallerThanSd  = c(
+            rmse_func(pDataFramesVec[[1]], pCol, pPredCol) < sapply(pDataFramesVec[[1]][pCol], sd),
+            rmse_func(pDataFramesVec[[2]], pCol, pPredCol) < sapply(pDataFramesVec[[2]][pCol], sd), 
+            rmse_func(pDataFramesVec[[3]], pCol, pPredCol) < sapply(pDataFramesVec[[3]][pCol], sd)
+        )
+    )
+    # Return the data frame.
+    return(df)
+}
