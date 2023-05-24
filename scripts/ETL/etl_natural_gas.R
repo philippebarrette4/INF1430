@@ -5,15 +5,17 @@
 # Data transformation
 library(dplyr)
 library(readr)
+library(here)
 # Import common func.R file
-source("scripts/Common/func.R")
+source(here::here("Scripts/Common", "func.R"))
 
 #=====================================================
 # RAW DATAFRAME: READ CSV FILE
 #=====================================================
 # Read CSV file: Whole House Electricity
 rawDF <- read_csv(
-    "data/NaturalGas_WHG.csv", show_col_types = FALSE,
+    here::here("Data/Bronze", "NaturalGas_WHG.csv"),
+    show_col_types = FALSE,
     col_types = cols(
         unix_ts     = col_double(),
         counter     = col_double(),
@@ -63,8 +65,8 @@ goldMonthlyDF <- silverDF %>%
 #=====================================================
 
 # Hourly natural gas Data Frame
-write_csv(goldHourlyDF,      append = FALSE, file = "curated/natural_gas/gold_hourly_natural_gas.csv",    col_names = TRUE)
+write_csv(goldHourlyDF,     append = FALSE, file = here::here("Data/Gold/NaturalGas", "gold_hourly_natural_gas.csv"),   col_names = TRUE)
 # Daily natural gas Data Frame
-write_csv(goldDailyDF,      append = FALSE, file = "curated/natural_gas/gold_daily_natural_gas.csv",    col_names = TRUE)
+write_csv(goldDailyDF,      append = FALSE, file = here::here("Data/Gold/NaturalGas", "gold_daily_natural_gas.csv"),    col_names = TRUE)
 # Monthly natural gas Data Frame
-write_csv(goldMonthlyDF,    append = FALSE, file = "curated/natural_gas/gold_monthly_natural_gas.csv",  col_names = TRUE)
+write_csv(goldMonthlyDF,    append = FALSE, file = here::here("Data/Gold/NaturalGas", "gold_monthly_natural_gas.csv"),  col_names = TRUE)

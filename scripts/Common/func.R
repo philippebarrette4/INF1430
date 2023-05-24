@@ -185,3 +185,163 @@ weather_consumption_correlation <- function(pDF, pTimeFrame) {
     # Return the CorrDF data frame
     return(CorrDF)
 }
+
+#' @description Computes the pairwise correlation between variables in a data frame for a given time frame.
+#' @param pDF: A data frame containing the variables to be correlated.
+#' @param pIndVarVec: A vector of strings containing the names of the variables to be correlated.
+#' @param pTimeFrame: A string indicating the time frame of the data.
+#' @return corrDF: A data frame containing the pairwise correlation between variables, as well as the time frame of the data.
+pairwise_correlations_function <- function(pDF, pIndVarVec, pTimeFrame) {
+    # Create an empty data frame with three columns to store the correlation results
+    corrDF <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c("independantVariableOne", "independantVariableTwo", "correlation"))
+    # Loop over all possible pairs of variables and compute the correlation
+    for (i in 1:length(pIndVarVec)) {
+        for (j in (i+1):length(pIndVarVec)) {
+            # Only compute the correlation if both variables are not NA and are not identical
+            if(!is.na(pIndVarVec[i]) & !is.na(pIndVarVec[j]) & pIndVarVec[i] != pIndVarVec[j]) {
+                # Create a new row in the correlation data frame with the variable names and correlation coefficient
+                newRow <- c(pIndVarVec[i], pIndVarVec[j], round(cor(pDF[pIndVarVec[i]], pDF[pIndVarVec[j]]), 3))
+                corrDF[nrow(corrDF) + 1, ] <- newRow
+            }
+        }
+    }
+    # Convert the correlation column to numeric and add a column for the time frame
+    corrDF <- corrDF %>% 
+        mutate(
+            correlation = as.numeric(correlation),
+            timeFrame = pTimeFrame
+        )
+    # Return the correlation data frame
+    return(corrDF)
+}
+
+#=================================================
+# MODEL TRAINING
+#=================================================
+
+#' @description This function performs k-fold cross-validation on a linear regression model.
+#' @param pDF: data frame to be used
+#' @param pKFolds: number of folds to be used in cross-validation
+#' @param pFormula: formula for the linear regression model
+#' @usage cross_validation_func(my_data_frame, 5, "response ~ predictor1 + predictor2")
+#' @return Data frame with predicted values from cross-validation
+cross_validation_func <- function(pDF, pKFolds, pFormula, pModel, pPredCol) {
+    # Get the number of rows in the data frame
+    nRows <- nrow(pDF)
+    # Split the data into k folds using kWayCrossValidation function from a package (not shown here)
+    splitPlan <- kWayCrossValidation(nRows, pKFolds, NULL, NULL)
+    k <- pKFolds
+    pDF[pPredCol] <- 0
+    for(i in 1:k) {
+        # Get the indices of the current fold for training and testing
+        split <- splitPlan[[i]]
+        if(pModel == "linear_regression"){
+            # Train a linear regression model on the training data
+            model <- lm(pFormula, data = pDF[split$train, ])
+            # Use the trained model to predict the response variable for the testing data
+            pDF[pPredCol][split$app, ] <- predict(model, pDF[split$app, ])
+        } else if(pModel == "random_forest"){
+            model <- ranger(pFormula, pDF[split$train, ], num.trees = 500, respect.unordered.factors = "order")
+            # Use the trained model to predict the response variable for the testing data
+            pDF[pPredCol][split$app, ] <- predict(model, pDF[split$app, ])$predictions
+        } else {
+            stop("Please provide a valid model algorithm ('linear_regression', 'random_forest')")
+        }
+    }
+    # Return the data frame with predicted values from cross-validation
+    return(pDF)
+}
+
+#=================================================
+# MODEL PERFORMANCE METRICS
+#=================================================
+
+#' @description This function calculates the root mean squared error (RMSE) between two columns of a data frame.
+#' @param pDF: data frame to be used
+#' @param pCol: name of the column containing the true values
+#' @param pPredCol: name of the column containing the predicted values
+#' @usage rmse_func(my_data_frame, "actual_col", "predicted_col")
+#' @return RMSE value
+rmse_func <- function(pDF, pCol, pPredCol) {
+    # Calculate the error between the predicted and true values
+    err <- (pDF[pPredCol] - pDF[pCol])[[pPredCol]]
+    # Square the errors
+    err2 <- err^2
+    # Calculate the mean of the squared errors and take the square root to get RMSE
+    rmse <- sqrt(mean(err2))
+    # Return the RMSE value
+    return(rmse)
+}
+
+#' This function calculates the coefficient of determination (R-squared) for a linear regression model.
+#' @param pDF: data frame to be used
+#' @param pCol: name of the column containing the true values
+#' @param pPredCol: name of the column containing the predicted values
+#' @usage r_squared_func(my_data_frame, "actual_col", "predicted_col")
+#' @return R-squared value
+r_squared_func <- function(pDF, pCol, pPredCol) {
+    # Calculate the error between the predicted and true values
+    err <- pDF[pPredCol] - pDF[pCol]
+    # Calculate the residual sum of squares (RSS)
+    rss <- sum(err[, pPredCol]^2)
+    # Calculate the total sum of squares (SSTO)
+    toterr <- pDF[pCol][[pCol]] - mean(as.list(pDF[pCol])[[pCol]])
+    sstot <- sum(toterr^2)
+    # Calculate the R-squared value
+    r_squared <- 1 - (rss/sstot)
+    # Return the R-squared value
+    return(r_squared)  
+}
+
+#=================================================
+# MODEL PERFORMANCE ANALYSIS
+#=================================================
+
+#' This function takes in a vector of linear regression models, a vector of data frames, and various parameters for calculating performance metrics such as 
+#'      - R-squared, 
+#'      - RMSE
+#'      - Standard deviation (SD)
+#' The function returns a data frame that summarizes the performance of each model over different timeframes (hour, day, month).
+#' @param pModelsVec: A vector of linear regression models.
+#' @param pDataFramesVec: A vector of data frames to evaluate the models.
+#' @param pCol: The name of the column in the data frame that contains the true values.
+#' @param pPredCol: The name of the column in the data frame that contains the predicted values.
+#' @param pPredColCv: The name of the column in the data frame that contains the predicted values (cross-validation).
+#' @return: A data frame with the following columns:
+#'     - timeFrame: The timeframe over which the model was evaluated (hour, day, month).
+#'     - rSquared: The R-squared value of the model over the given timeframe.
+#'     - rmse: The root mean squared error (RMSE) of the model over the given timeframe.
+#'     - sd: The standard deviation (SD) of the true values over the given timeframe.
+#'     - rmseIsSmallerThanSd: A binary indicator (TRUE/FALSE) indicating if the RMSE of the model is smaller than the SD of the true values over the given timeframe. 
+#'       If TRUE, the model tends to estimate consumption better than simply taking the average of the data itself.
+performance_matrix_func <- function(pModelsVec, pDataFramesVec, pCol, pPredCol, pPredColCv) {
+    # Create a data frame with columns for timeFrame, rSquared, rmse, and sd.
+    # Initialize the values for these columns with the results from the first model and the first data frame.
+    # These values will be overwritten as we loop through the different timeframes.
+    df <- data.frame(
+        timeFrame = c("hour", "day", "month"),
+        rSquared = c(
+            r_squared_func(pDataFramesVec[[1]], pCol, pPredCol),      
+            r_squared_func(pDataFramesVec[[2]], pCol, pPredCol),        
+            r_squared_func(pDataFramesVec[[3]], pCol, pPredCol)
+        ),
+        rmse = c(
+            rmse_func(pDataFramesVec[[1]], pCol, pPredCol),         
+            rmse_func(pDataFramesVec[[2]], pCol, pPredCol),          
+            rmse_func(pDataFramesVec[[3]], pCol, pPredCol)
+        ),
+        sd = c(
+            sapply(pDataFramesVec[[1]][pCol], sd),                           
+            sapply(pDataFramesVec[[2]][pCol], sd),                            
+            sapply(pDataFramesVec[[3]][pCol], sd)
+        ),
+        # If RMSE smaller than SD: Model tends to estimate consumption better than simply taking the average of the data itself
+        rmseIsSmallerThanSd  = c(
+            rmse_func(pDataFramesVec[[1]], pCol, pPredCol) < sapply(pDataFramesVec[[1]][pCol], sd),
+            rmse_func(pDataFramesVec[[2]], pCol, pPredCol) < sapply(pDataFramesVec[[2]][pCol], sd), 
+            rmse_func(pDataFramesVec[[3]], pCol, pPredCol) < sapply(pDataFramesVec[[3]][pCol], sd)
+        )
+    )
+    # Return the data frame.
+    return(df)
+}
