@@ -6,14 +6,15 @@
 library(dplyr)
 library(readr)
 # Import common func.R file
-source("scripts/Common/func.R")
+source(here::here("Scripts/Common", "func.R"))
 
 #=====================================================
 # RAW DATAFRAME: READ CSV FILE
 #=====================================================
 # Read CSV file: Whole House Water
 rawDF <- read_csv(
-    "data/Water_WHW.csv", show_col_types = FALSE,
+    here::here("Data/Bronze", "Water_WHW.csv"), 
+    show_col_types = FALSE,
     col_types = cols(
         unix_ts     = col_double(),
         counter     = col_double(),
@@ -61,8 +62,8 @@ goldMonthlyDF <- silverDF %>%
 #=====================================================
 
 # Hourly water Data Frame
-write_csv(goldHourlyDF,      append = FALSE, file = "curated/water/gold_hourly_water.csv",    col_names = TRUE)
+write_csv(goldHourlyDF,     append = FALSE, file = here::here("Data/Gold/Water", "gold_hourly_water.csv"),   col_names = TRUE)
 # Daily water Data Frame
-write_csv(goldDailyDF,      append = FALSE, file = "curated/water/gold_daily_water.csv",    col_names = TRUE)
+write_csv(goldDailyDF,      append = FALSE, file = here::here("Data/Gold/Water", "gold_daily_water.csv"),    col_names = TRUE)
 # Monthly water Data Frame
-write_csv(goldMonthlyDF,    append = FALSE, file = "curated/water/gold_monthly_water.csv",  col_names = TRUE)
+write_csv(goldMonthlyDF,    append = FALSE, file = here::here("Data/Gold/Water", "gold_monthly_water.csv"),  col_names = TRUE)
