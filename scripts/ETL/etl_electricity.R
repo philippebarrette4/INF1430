@@ -5,15 +5,17 @@
 # Data transformation
 library(dplyr)
 library(readr)
+library(here)
 # Import common func.R file
-source("scripts/Common/func.R")
+source(here::here("Scripts/Common", "func.R"))
 
 #=====================================================
 # RAW DATAFRAME: READ CSV FILE
 #=====================================================
 # Read CSV file: Whole House Electricity
 rawDF <- read_csv(
-    "./data/Electricity_WHE.csv", show_col_types = FALSE,
+    here::here("Data/Bronze", "Electricity_WHE.csv"),
+    show_col_types = FALSE,
     col_types = cols(
         unix_ts = col_double(),
         V       = col_double(),
@@ -70,8 +72,8 @@ goldMonthlyDF <- silverDF %>%
 #=====================================================
 
 # Hourly electricity Data Frame
-write_csv(goldHourlyDF,     append = FALSE, file = "curated/electricity/gold_hourly_electricity.csv",   col_names = TRUE)
+write_csv(goldHourlyDF,     append = FALSE, file = here::here("Data/Gold/Electricity", "gold_hourly_electricity.csv"),   col_names = TRUE)
 # Daily electricity Data Frame
-write_csv(goldDailyDF,      append = FALSE, file = "curated/electricity/gold_daily_electricity.csv",    col_names = TRUE)
+write_csv(goldDailyDF,      append = FALSE, file = here::here("Data/Gold/Electricity", "gold_daily_electricity.csv"),    col_names = TRUE)
 # Monthly electricity Data Frame
-write_csv(goldMonthlyDF,    append = FALSE, file = "curated/electricity/gold_monthly_electricity.csv",  col_names = TRUE)
+write_csv(goldMonthlyDF,    append = FALSE, file = here::here("Data/Gold/Electricity", "gold_monthly_electricity.csv"),  col_names = TRUE)
