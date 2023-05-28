@@ -7,7 +7,7 @@ library(dplyr)
 library(readr)
 library(here)
 # Import common func.R file
-source(here::here("Scripts/Common", "func.R"))
+source(here::here("Scripts/Common", "common.R"))
 
 #=====================================================
 # RAW DATAFRAME: READ CSV FILE
