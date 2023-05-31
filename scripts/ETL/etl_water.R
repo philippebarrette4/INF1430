@@ -36,21 +36,21 @@ silverDF <- rawDF %>%
 # GOLD DATAFRAMES: AGGREGATE DATA
 #=====================================================
 
-# Aggregation of consumption (kL) by hour
+# Aggregation of consumption (Liter) by hour
 goldHourlyDF <- silverDF %>%
     group_by(year, month, date, day, hour) %>%
     summarise(
         consumption = sum(avg_rate)
     )
 
-# Aggregation of consumption (kL) by day
+# Aggregation of consumption (Liter) by day
 goldDailyDF <- silverDF %>%
     group_by(year, month, day, date) %>%
     summarise(
         consumption = sum(avg_rate)
     )
 
-# Aggregation of consumption (kL) by month
+# Aggregation of consumption (Liter) by month
 goldMonthlyDF <- silverDF %>%
     group_by(year, month) %>%
     summarise(
