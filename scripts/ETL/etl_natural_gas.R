@@ -33,7 +33,7 @@ rawDF <- read_csv(
 # Divide by 60 (min to hour), then by 10 (cubic meter to cubic deci-meter)
 silverDF <- rawDF %>%
             convert_timeStamp("unix_ts") %>%
-            mutate(avg_rate_modif = avg_rate / (60 * 10))
+            mutate(avg_rate_modif = avg_rate / (60 * 1000))
 
 #=====================================================
 # GOLD DATAFRAMES: AGGREGATE DATA
