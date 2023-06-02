@@ -7,7 +7,7 @@ library(dplyr)
 library(readr)
 library(here)
 # Import common func.R file
-source(here::here("Scripts/Common", "func.R"))
+source(here::here("Scripts/Common", "common.R"))
 
 #=====================================================
 # RAW DATAFRAME: READ CSV FILE
@@ -29,10 +29,11 @@ rawDF <- read_csv(
 #=====================================================
 
 # Derive unix timestamp column to date related columns: year, month, day
-# Compute the real Watts consumption
+# Compute the real consumption of cubic deci-meters per hour (dm3/h)
+# Divide by 60 (min to hour), then by 10 (cubic meter to cubic deci-meter)
 silverDF <- rawDF %>%
             convert_timeStamp("unix_ts") %>%
-            mutate(avg_rate_modif = avg_rate / 60)
+            mutate(avg_rate_modif = avg_rate / (60 * 1000))
 
 #=====================================================
 # GOLD DATAFRAMES: AGGREGATE DATA

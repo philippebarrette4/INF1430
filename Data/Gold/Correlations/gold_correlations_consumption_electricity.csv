@@ -1,0 +1,10 @@
+variable_one,variable_two,hourly,daily,monthly
+Consumption,Average Temperature,-0.162,-0.435,-0.749
+Consumption,Average Dew Point,-0.117,-0.328,-0.649
+Consumption,Average Relative Humidity (%),0.117,0.309,0.626
+Consumption,Average Wind Direction,-0.056,-0.183,-0.506
+Consumption,Average Wind Speed,0.073,0.157,0.081
+Consumption,Average Visibility,-0.114,-0.335,-0.719
+Consumption,Average Station Pressure,0.015,-0.021,0.263
+Consumption,Average Humidex,-0.019,0.016,-0.338
+Consumption,Average Wind Chill,0.009,0.062,0.142
