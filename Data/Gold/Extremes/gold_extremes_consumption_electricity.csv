@@ -1,0 +1,8 @@
+Time Frame,Year,Month,Day,Hour,Minimal Consumption,Maximal Consumption
+Hour,2012,6,13,22,0.516,NA
+Hour,2012,6,17,22,0.516,NA
+Hour,2013,12,2,10,NA,6.442
+Day,2012,4,1,NA,13.755,NA
+Day,2012,12,4,NA,NA,49.856
+Month,2012,6,NA,NA,708.651,NA
+Month,2012,11,NA,NA,NA,1073.132
